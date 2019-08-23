@@ -1,8 +1,0 @@
-All statistics are based on contigs of size >= 500 bp, unless otherwise noted (e.g., "# contigs (>= 0 bp)" and "Total length (>= 0 bp)" include all contigs).
-
-Assembly                       NEK_END  NEK_START  NEK_clone_2  NEK_clone_3  NEK_clone_4  NEK_clone_5
-# fully unaligned contigs      2894     3254       4461         4355         4358         4495       
-Fully unaligned length         4319816  4772776    5486086      5351342      5242776      5411829    
-# partially unaligned contigs  2317     2347       2335         2281         2204         2179       
-Partially unaligned length     6898961  6378530    5934485      5567989      6585464      6247239    
-# N's                          39010    44900      61390        47150        69200        73088      
