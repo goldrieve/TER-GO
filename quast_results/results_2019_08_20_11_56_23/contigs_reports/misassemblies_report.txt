@@ -1,0 +1,23 @@
+All statistics are based on contigs of size >= 500 bp, unless otherwise noted (e.g., "# contigs (>= 0 bp)" and "Total length (>= 0 bp)" include all contigs).
+
+Assembly                     NEK_END  NEK_START  NEK_clone_2  NEK_clone_3  NEK_clone_4  NEK_clone_5
+# misassemblies              341      319        262          270          286          252        
+  # contig misassemblies     339      316        256          265          282          250        
+    # c. relocations         103      96         75           88           85           85         
+    # c. translocations      236      218        181          177          197          165        
+    # c. inversions          0        2          0            0            0            0          
+  # scaffold misassemblies   2        3          6            5            4            2          
+    # s. relocations         2        3          3            4            2            2          
+    # s. translocations      0        0          3            1            2            0          
+    # s. inversions          0        0          0            0            0            0          
+# misassembled contigs       282      271        216          213          237          209        
+Misassembled contigs length  2378619  1802798    2607917      2332715      2954030      2654193    
+# local misassemblies        471      523        496          435          496          496        
+# scaffold gap ext. mis.     27       26         32           26           22           24         
+# scaffold gap loc. mis.     291      350        451          363          559          571        
+# unaligned mis. contigs     939      933        903          876          917          916        
+# mismatches                 258163   259546     249669       245918       250183       250179     
+# indels                     35891    34716      35911        36420        36180        35967      
+    # indels (<= 5 bp)       30454    29530      30393        30760        30559        30474      
+    # indels (> 5 bp)        5437     5186       5518         5660         5621         5493       
+Indels length                130050   126468     133883       136512       135930       135529     

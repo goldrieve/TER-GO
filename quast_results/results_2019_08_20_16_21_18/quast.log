@@ -1,0 +1,196 @@
+/Users/s1886853/miniconda3/envs/main_env/lib/python3.6/site-packages/quast-5.0.2-py3.6.egg-info/scripts/quast.py /Users/s1886853/TERGO/NEK_assemblies/Assemblies/NEK_END.fasta /Users/s1886853/TERGO/NEK_assemblies/Assemblies/NEK_START.fasta /Users/s1886853/TERGO/NEK_assemblies/Assemblies/NEK_clone_2.fasta /Users/s1886853/TERGO/NEK_assemblies/Assemblies/NEK_clone_3.fasta /Users/s1886853/TERGO/NEK_assemblies/Assemblies/NEK_clone_4.fasta /Users/s1886853/TERGO/NEK_assemblies/Assemblies/NEK_clone_5.fasta -r /Users/s1886853/TERGO/Reference_genomes/TriTrypDB-44_TbruceiTREU927_Genome.fasta -g /Users/s1886853/TERGO/Reference_genomes/TriTrypDB-44_TbruceiTREU927.gff --ref-bam /Users/s1886853/TERGO/NEK_assemblies/927_aln/NEK_END_sorted.bam --ref-bam /Users/s1886853/TERGO/NEK_assemblies/927_aln/NEK_START_sorted.bam --ref-bam /Users/s1886853/TERGO/NEK_assemblies/927_aln/Clone_2_sorted.bam --ref-bam /Users/s1886853/TERGO/NEK_assemblies/927_aln/Clone_3_sorted.bam --ref-bam /Users/s1886853/TERGO/NEK_assemblies/927_aln/Clone_4_sorted.bam --ref-bam /Users/s1886853/TERGO/NEK_assemblies/927_aln/Clone_5_sorted.bam -e
+
+Version: 5.0.2, b7350347c
+
+System information:
+  OS: Darwin-18.7.0-x86_64-i386-64bit (macosx)
+  Python version: 3.6.7
+  CPUs number: 16
+
+Started: 2019-08-20 16:21:18
+
+Logging to /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/quast.log
+NOTICE: Maximum number of threads is set to 4 (use --threads option to set it manually)
+
+CWD: /Users/s1886853/TERGO/Scripts
+Main parameters: 
+  MODE: default, threads: 4, eukaryotic: true, minimum contig length: 500, minimum alignment length: 65, \
+  ambiguity: one, threshold for extensive misassembly size: 1000
+
+Reference:
+  /Users/s1886853/TERGO/Reference_genomes/TriTrypDB-44_TbruceiTREU927_Genome.fasta ==> TriTrypDB_44_TbruceiTREU927_Genome
+
+Contigs:
+  Pre-processing...
+  1  /Users/s1886853/TERGO/NEK_assemblies/Assemblies/NEK_END.fasta ==> NEK_END
+  2  /Users/s1886853/TERGO/NEK_assemblies/Assemblies/NEK_START.fasta ==> NEK_START
+  3  /Users/s1886853/TERGO/NEK_assemblies/Assemblies/NEK_clone_2.fasta ==> NEK_clone_2
+  4  /Users/s1886853/TERGO/NEK_assemblies/Assemblies/NEK_clone_3.fasta ==> NEK_clone_3
+  5  /Users/s1886853/TERGO/NEK_assemblies/Assemblies/NEK_clone_4.fasta ==> NEK_clone_4
+  6  /Users/s1886853/TERGO/NEK_assemblies/Assemblies/NEK_clone_5.fasta ==> NEK_clone_5
+
+2019-08-20 16:21:23
+Running Basic statistics processor...
+  Reference genome:
+    TriTrypDB_44_TbruceiTREU927_Genome.fasta, length = 35826294, num fragments = 131, GC % = 45.49
+WARNING:   Reference genome is fragmented. You may consider rerunning QUAST using --fragmented option. QUAST will try to detect misassemblies caused by the fragmentation and mark them fake (will be excluded from # misassemblies).
+  Contig files: 
+    1  NEK_END
+    2  NEK_START
+    3  NEK_clone_2
+    4  NEK_clone_3
+    5  NEK_clone_4
+    6  NEK_clone_5
+  Calculating N50 and L50...
+    1  NEK_END, N50 = 15026, L50 = 412, Total length = 34983361, GC % = 44.56, # N's per 100 kbp =  111.51
+    2  NEK_START, N50 = 12068, L50 = 526, Total length = 34900198, GC % = 44.61, # N's per 100 kbp =  128.65
+    3  NEK_clone_2, N50 = 17619, L50 = 278, Total length = 35068276, GC % = 44.37, # N's per 100 kbp =  175.06
+    4  NEK_clone_3, N50 = 20532, L50 = 262, Total length = 34510083, GC % = 44.53, # N's per 100 kbp =  136.63
+    5  NEK_clone_4, N50 = 17179, L50 = 292, Total length = 35541370, GC % = 44.42, # N's per 100 kbp =  194.70
+    6  NEK_clone_5, N50 = 16472, L50 = 287, Total length = 35322680, GC % = 44.40, # N's per 100 kbp =  206.92
+  Drawing Nx plot...
+    saved to /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/basic_stats/Nx_plot.pdf
+  Drawing NGx plot...
+    saved to /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/basic_stats/NGx_plot.pdf
+  Drawing cumulative plot...
+    saved to /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/basic_stats/cumulative_plot.pdf
+  Drawing GC content plot...
+    saved to /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/basic_stats/GC_content_plot.pdf
+  Drawing NEK_END GC content plot...
+    saved to /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/basic_stats/NEK_END_GC_content_plot.pdf
+  Drawing NEK_START GC content plot...
+    saved to /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/basic_stats/NEK_START_GC_content_plot.pdf
+  Drawing NEK_clone_2 GC content plot...
+    saved to /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/basic_stats/NEK_clone_2_GC_content_plot.pdf
+  Drawing NEK_clone_3 GC content plot...
+    saved to /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/basic_stats/NEK_clone_3_GC_content_plot.pdf
+  Drawing NEK_clone_4 GC content plot...
+    saved to /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/basic_stats/NEK_clone_4_GC_content_plot.pdf
+  Drawing NEK_clone_5 GC content plot...
+    saved to /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/basic_stats/NEK_clone_5_GC_content_plot.pdf
+  Drawing Coverage histogram (bin size: 1x)...
+    saved to /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/basic_stats/coverage_histogram.pdf
+  Drawing NEK_END coverage histogram (bin size: 1x)...
+    saved to /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/basic_stats/NEK_END_coverage_histogram.pdf
+  Drawing NEK_START coverage histogram (bin size: 1x)...
+    saved to /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/basic_stats/NEK_START_coverage_histogram.pdf
+  Drawing NEK_clone_2 coverage histogram (bin size: 1x)...
+    saved to /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/basic_stats/NEK_clone_2_coverage_histogram.pdf
+  Drawing NEK_clone_3 coverage histogram (bin size: 1x)...
+    saved to /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/basic_stats/NEK_clone_3_coverage_histogram.pdf
+  Drawing NEK_clone_4 coverage histogram (bin size: 1x)...
+    saved to /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/basic_stats/NEK_clone_4_coverage_histogram.pdf
+  Drawing NEK_clone_5 coverage histogram (bin size: 1x)...
+    saved to /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/basic_stats/NEK_clone_5_coverage_histogram.pdf
+Done.
+
+2019-08-20 16:21:37
+Running Contig analyzer...
+  1  NEK_END
+  1  Logging to files /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/contigs_reports/contigs_report_NEK_END.stdout and contigs_report_NEK_END.stderr...
+  1  Aligning contigs to the reference
+  2  NEK_START
+  2  Logging to files /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/contigs_reports/contigs_report_NEK_START.stdout and contigs_report_NEK_START.stderr...
+  2  Aligning contigs to the reference
+  3  NEK_clone_2
+  3  Logging to files /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/contigs_reports/contigs_report_NEK_clone_2.stdout and contigs_report_NEK_clone_2.stderr...
+  3  Aligning contigs to the reference
+  4  NEK_clone_3
+  4  Logging to files /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/contigs_reports/contigs_report_NEK_clone_3.stdout and contigs_report_NEK_clone_3.stderr...
+  4  Aligning contigs to the reference
+  1  /Users/s1886853/miniconda3/envs/main_env/lib/python3.6/site-packages/quast_libs/minimap2/minimap2 \
+     -c -x asm5 -B5 -O4,16 --no-long-join -r 85 -N 50 -s 65 -z 200 --mask-level 0.9 \
+     --min-occ 200 -g 2500 --score-N 2 --cs -t 1 quast_results/results_2019_08_20_16_21_18/quast_corrected_input/TriTrypDB_44_TbruceiTREU927_Genome.fasta \
+     quast_results/results_2019_08_20_16_21_18/quast_corrected_input/NEK_END.fasta \
+     > quast_results/results_2019_08_20_16_21_18/contigs_reports/minimap_output/NEK_END.coords_tmp \
+     2>> quast_results/results_2019_08_20_16_21_18/contigs_reports/contigs_report_NEK_END.stderr
+  2  /Users/s1886853/miniconda3/envs/main_env/lib/python3.6/site-packages/quast_libs/minimap2/minimap2 \
+     -c -x asm5 -B5 -O4,16 --no-long-join -r 85 -N 50 -s 65 -z 200 --mask-level 0.9 \
+     --min-occ 200 -g 2500 --score-N 2 --cs -t 1 quast_results/results_2019_08_20_16_21_18/quast_corrected_input/TriTrypDB_44_TbruceiTREU927_Genome.fasta \
+     quast_results/results_2019_08_20_16_21_18/quast_corrected_input/NEK_START.fasta \
+     > quast_results/results_2019_08_20_16_21_18/contigs_reports/minimap_output/NEK_START.coords_tmp \
+     2>> quast_results/results_2019_08_20_16_21_18/contigs_reports/contigs_report_NEK_START.stderr
+  3  /Users/s1886853/miniconda3/envs/main_env/lib/python3.6/site-packages/quast_libs/minimap2/minimap2 \
+     -c -x asm5 -B5 -O4,16 --no-long-join -r 85 -N 50 -s 65 -z 200 --mask-level 0.9 \
+     --min-occ 200 -g 2500 --score-N 2 --cs -t 1 quast_results/results_2019_08_20_16_21_18/quast_corrected_input/TriTrypDB_44_TbruceiTREU927_Genome.fasta \
+     quast_results/results_2019_08_20_16_21_18/quast_corrected_input/NEK_clone_2.fasta \
+     > quast_results/results_2019_08_20_16_21_18/contigs_reports/minimap_output/NEK_clone_2.coords_tmp \
+     2>> quast_results/results_2019_08_20_16_21_18/contigs_reports/contigs_report_NEK_clone_2.stderr
+  4  /Users/s1886853/miniconda3/envs/main_env/lib/python3.6/site-packages/quast_libs/minimap2/minimap2 \
+     -c -x asm5 -B5 -O4,16 --no-long-join -r 85 -N 50 -s 65 -z 200 --mask-level 0.9 \
+     --min-occ 200 -g 2500 --score-N 2 --cs -t 1 quast_results/results_2019_08_20_16_21_18/quast_corrected_input/TriTrypDB_44_TbruceiTREU927_Genome.fasta \
+     quast_results/results_2019_08_20_16_21_18/quast_corrected_input/NEK_clone_3.fasta \
+     > quast_results/results_2019_08_20_16_21_18/contigs_reports/minimap_output/NEK_clone_3.coords_tmp \
+     2>> quast_results/results_2019_08_20_16_21_18/contigs_reports/contigs_report_NEK_clone_3.stderr
+  4  Analysis is finished.
+
+  5  NEK_clone_4
+  5  Logging to files /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/contigs_reports/contigs_report_NEK_clone_4.stdout and contigs_report_NEK_clone_4.stderr...
+  5  Aligning contigs to the reference
+  5  /Users/s1886853/miniconda3/envs/main_env/lib/python3.6/site-packages/quast_libs/minimap2/minimap2 \
+     -c -x asm5 -B5 -O4,16 --no-long-join -r 85 -N 50 -s 65 -z 200 --mask-level 0.9 \
+     --min-occ 200 -g 2500 --score-N 2 --cs -t 1 quast_results/results_2019_08_20_16_21_18/quast_corrected_input/TriTrypDB_44_TbruceiTREU927_Genome.fasta \
+     quast_results/results_2019_08_20_16_21_18/quast_corrected_input/NEK_clone_4.fasta \
+     > quast_results/results_2019_08_20_16_21_18/contigs_reports/minimap_output/NEK_clone_4.coords_tmp \
+     2>> quast_results/results_2019_08_20_16_21_18/contigs_reports/contigs_report_NEK_clone_4.stderr
+  3  Analysis is finished.
+
+  6  NEK_clone_5
+  6  Logging to files /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/contigs_reports/contigs_report_NEK_clone_5.stdout and contigs_report_NEK_clone_5.stderr...
+  6  Aligning contigs to the reference
+  6  /Users/s1886853/miniconda3/envs/main_env/lib/python3.6/site-packages/quast_libs/minimap2/minimap2 \
+     -c -x asm5 -B5 -O4,16 --no-long-join -r 85 -N 50 -s 65 -z 200 --mask-level 0.9 \
+     --min-occ 200 -g 2500 --score-N 2 --cs -t 1 quast_results/results_2019_08_20_16_21_18/quast_corrected_input/TriTrypDB_44_TbruceiTREU927_Genome.fasta \
+     quast_results/results_2019_08_20_16_21_18/quast_corrected_input/NEK_clone_5.fasta \
+     > quast_results/results_2019_08_20_16_21_18/contigs_reports/minimap_output/NEK_clone_5.coords_tmp \
+     2>> quast_results/results_2019_08_20_16_21_18/contigs_reports/contigs_report_NEK_clone_5.stderr
+  2  Analysis is finished.
+
+  1  Analysis is finished.
+
+  6  Analysis is finished.
+
+  5  Analysis is finished.
+
+  Creating total report...
+    saved to /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/contigs_reports/misassemblies_report.txt, misassemblies_report.tsv, and misassemblies_report.tex
+  Transposed version of total report...
+    saved to /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/contigs_reports/transposed_report_misassemblies.txt, transposed_report_misassemblies.tsv, and transposed_report_misassemblies.tex
+  Creating total report...
+    saved to /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/contigs_reports/unaligned_report.txt, unaligned_report.tsv, and unaligned_report.tex
+  Drawing misassemblies by types plot...
+    saved to /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/contigs_reports/misassemblies_plot.pdf
+  Drawing misassemblies FRCurve plot...
+    saved to /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/contigs_reports/misassemblies_frcurve_plot.pdf
+Done.
+
+2019-08-20 16:22:27
+Running NA-NGA calculation...
+  1  NEK_END, Largest alignment = 226229, NA50 = 11988, NGA50 = 10442, LA50 = 444, LGA50 = 481
+  2  NEK_START, Largest alignment = 190641, NA50 = 8542, NGA50 = 7294, LA50 = 574, LGA50 = 632
+  3  NEK_clone_2, Largest alignment = 305895, NA50 = 15468, NGA50 = 13112, LA50 = 300, LGA50 = 326
+  4  NEK_clone_3, Largest alignment = 304995, NA50 = 18567, NGA50 = 14828, LA50 = 282, LGA50 = 322
+  5  NEK_clone_4, Largest alignment = 306963, NA50 = 14015, NGA50 = 13340, LA50 = 322, LGA50 = 332
+  6  NEK_clone_5, Largest alignment = 303798, NA50 = 13498, NGA50 = 11996, LA50 = 315, LGA50 = 335
+  Drawing cumulative plot...
+    saved to /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/aligned_stats/cumulative_plot.pdf
+  Drawing NAx plot...
+    saved to /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/aligned_stats/NAx_plot.pdf
+  Drawing NGAx plot...
+    saved to /Users/s1886853/TERGO/Scripts/quast_results/results_2019_08_20_16_21_18/aligned_stats/NGAx_plot.pdf
+Done.
+
+2019-08-20 16:22:29
+Running Genome analyzer...
+  NOTICE: No file with operons were provided. Use the -O option if you want to specify it.
+  Loaded 63928 genomic features of type "ANY"
+  1  NEK_END
+  2  NEK_START
+  3  NEK_clone_2
+  4  NEK_clone_3
+  1  Analysis is finished.
+  5  NEK_clone_4
+  4  Analysis is finished.
+  6  NEK_clone_5
+  3  Analysis is finished.
+  2  Analysis is finished.
