@@ -21,7 +21,6 @@ samples[,c("spp","stage","line","sample")]
 samples_UPA <- samples[ which(samples$line=='UPA') ,]
 samples_NEK <- samples[ which(samples$line=='NEK') ,]
 
-
 ####################################################################
 # UPA analysis
 ####################################################################
@@ -33,7 +32,6 @@ names(files) <- samples_UPA$sample
 #Make a txdb which is used to create tx2gene
 library(GenomicFeatures)
 txdb = makeTxDbFromGFF('TriTrypDB-46_TbruceiTREU927.gff')
-genes(txdb)
 k <- keys(txdb, keytype = "TXNAME")
 tx2gene <- select(txdb, k, "GENEID", "TXNAME")
 
@@ -43,15 +41,15 @@ txi <- tximport(files, type="salmon", tx2gene=tx2gene)
 
 #Set up DESeq2 for a single design analysis
 library (DESeq2)
-ddsTxi <- DESeqDataSetFromTximport(txi,
+ddsTxi_UPA <- DESeqDataSetFromTximport(txi,
                                    colData = samples_UPA,
                                    design = ~ stage)
-
 #Keep genes above 10
-keep <- rowSums(counts(ddsTxi)) >= 10
-dds_UPA <- ddsTxi[keep,]
 
-#Specify the reference level and drop intermediate atm
+keep_UPA <- rowSums(counts(ddsTxi_UPA)) >= 10
+dds_UPA <- ddsTxi_UPA[keep_UPA,]
+
+#Specify the reference level
 dds_UPA$stage <- relevel(dds_UPA$stage, ref = "Start")
 dds_UPA$stage <- droplevels(dds_UPA$stage)
 
@@ -59,151 +57,461 @@ dds_UPA$stage <- droplevels(dds_UPA$stage)
 dds_UPA <- DESeq(dds_UPA)
 resultsNames(dds_UPA)
 
-res_ST_V_INT <- results(dds_UPA, contrast=c("stage","Start","Intermediate"))
-res_ST_V_END <- results(dds_UPA, contrast=c("stage","Start","End"))
-res_INT_V_END <- results(dds_UPA, contrast=c("stage","Intermediate","End"))
-
-summary(res_ST_V_INT)
-sum(res_ST_V_INT$padj < 0.1, na.rm=TRUE)
-
-summary(res_ST_V_END)
-sum(res_ST_V_END$padj < 0.1, na.rm=TRUE)
-
-summary(res_INT_V_END)
-sum(res_INT_V_END$padj < 0.1, na.rm=TRUE)
-
-#Perform shrinkage of dataset with apeglm
-library (apeglm)
-
-#Perform alternative shrinkage with normal
-res_ST_V_INT_Norm <- lfcShrink(dds_UPA, contrast=c("stage","Start","Intermediate"), type="normal")
-res_ST_V_END_Norm <- lfcShrink(dds_UPA, contrast=c("stage","Start","End"), type="normal")
-res_INT_V_END_Norm <- lfcShrink(dds_UPA, contrast=c("stage","Intermediate","End"), type="normal")
-
-
-#Perform alternative shrinkage with ashr
-library(ashr)
-res_ST_V_INT_ashr <- lfcShrink(dds_UPA, contrast=c("stage","Start","Intermediate"), type="ashr")
-res_ST_V_END_ashr <- lfcShrink(dds_UPA, contrast=c("stage","Start","End"), type="ashr")
-res_INT_V_END_ashr <- lfcShrink(dds_UPA, contrast=c("stage","Intermediate","End"), type="ashr")
-
-#Plot alternative shrinkage estimation for ST_V_INT
-par(mfrow=c(1,3), mar=c(4,4,2,1))
-xlim <- c(1,1e5); ylim <- c(-3,3)
-plotMA(res_ST_V_INT, xlim=xlim, ylim=ylim, main="Unshrunk")
-plotMA(res_ST_V_INT_Norm, xlim=xlim, ylim=ylim, main="normal")
-plotMA(res_ST_V_INT_ashr, xlim=xlim, ylim=ylim, main="ashr")
-
-#Plot alternative shrinkage estimation for ST_V_END
-par(mfrow=c(1,3), mar=c(4,4,2,1))
-xlim <- c(1,1e5); ylim <- c(-3,3)
-plotMA(res_ST_V_END, xlim=xlim, ylim=ylim, main="Unshrunk")
-plotMA(res_ST_V_END_Norm, xlim=xlim, ylim=ylim, main="normal")
-plotMA(res_ST_V_END_ashr , xlim=xlim, ylim=ylim, main="ashr")
-
-#Plot alternative shrinkage estimation for INT_V_END
-par(mfrow=c(1,3), mar=c(4,4,2,1))
-xlim <- c(1,1e5); ylim <- c(-3,3)
-plotMA(res_INT_V_END , xlim=xlim, ylim=ylim, main="Unshrunk")
-plotMA(res_INT_V_END_Norm, xlim=xlim, ylim=ylim, main="normal")
-plotMA(res_INT_V_END_ashr, xlim=xlim, ylim=ylim, main="ashr")
-
-#Perform independent hypothesis weighting for p-value filtering
-library("IHW")
-resIHW <- results(dds_UPA, filterFun=ihw)
-summary(resIHW)
-sum(resIHW$padj < 0.1, na.rm=TRUE)
-metadata(resIHW)$ihwResult
-
-####################################################################
-# Plot counts
-####################################################################
-plotCounts(dds_UPA, gene=which.min(res_ST_V_END_ashr$padj), intgroup="stage")
-d <- plotCounts(dds, gene=which.min(res_ST_V_END_ashr$padj), intgroup="stage", 
-                returnData=TRUE)
-
-library("ggplot2")
-ggplot(d, aes(x=stage, y=count)) + 
-  geom_point(position=position_jitter(w=0.1,h=0)) + 
-  scale_y_log10(breaks=c(25,100,400))
-
-mcols(res)$description
-
-####################################################################
-# Export DF to CSV
-####################################################################
-
-res_ST_V_END_ashr_DF <- as.data.frame(res_ST_V_END_ashr)
-res_ST_V_INT_ashr_DF <- as.data.frame(res_ST_V_INT_ashr)
-
-all_df <- merge(as.data.frame(res_ST_V_END_ashr),as.data.frame(res_ST_V_INT_ashr), by="baseMean")
-
-
-write.csv(as.data.frame(res_sig_ST_V_END_APELGM), 
-          file="APEGLM_results_ST_V_END.csv")
-
-resSig <- subset(res_ST_V_INT_APELGM, padj < 0.1)
-write.csv(as.data.frame(resSig), 
-          file="condition_treated_results_sig.csv")
-
-res_sig_ST_V_END_APELGM <- subset(res_ST_V_END_APELGM, padj < 0.1)
-write.csv(as.data.frame(res_sig_ST_V_END_APELGM), 
-          file="APEGLM_results_ST_V_END.csv")
-
 ####################################################################
 # Transforming the data for visualisation
 ####################################################################
-
+ntd_UPA <- normTransform(dds_UPA)
+# this gives log2(n + 1)
+ntd_UPA <- normTransform(dds_UPA)
 library("vsn")
-vsd <- vst(dds_UPA, blind=FALSE)
-rld <- rlog(dds_UPA, blind=FALSE)
-ntd <- normTransform(dds_UPA)
+meanSdPlot(assay(ntd_UPA))
 
-meanSdPlot(assay(ntd))
-meanSdPlot(assay(vsd))
-meanSdPlot(assay(rld))
+#Many transformation options available - VSD seems most appropriate
+vsd_UPA <- vst(dds_UPA, blind=TRUE)
+meanSdPlot(assay(vsd_UPA))
 
 ####################################################################
-# Data quality assessment by sample clustering and visualization
+# Sample clustering
 ####################################################################
-
-library("pheatmap")
-
-select <- order(rowMeans(counts(dds_UPA,normalized=TRUE)),
-                decreasing=TRUE)[1:20]
-
-df <- as.data.frame(colData(dds_UPA)[("stage")])
-
-pheatmap(assay(ntd)[select,], cluster_rows=FALSE, show_rownames=FALSE,
-         cluster_cols=FALSE, annotation_col=df)
-
-pheatmap(assay(vsd)[select,], cluster_rows=FALSE, show_rownames=FALSE,
-         cluster_cols=FALSE, annotation_col=df)
-
-sampleDists <- dist(t(assay(vsd)))
 
 library("RColorBrewer")
-
-sampleDistMatrix <- as.matrix(sampleDists)
-
-rownames(sampleDistMatrix) <- paste(sd$stage, sep="-")
-colnames(sampleDistMatrix) <- NULL
-
+sampleDists_UPA <- dist(t(assay(vsd_UPA)))
+sampleDistMatrix_UPA <- as.matrix(sampleDists_UPA)
+colnames(sampleDistMatrix_UPA) <- NULL
 colors <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
-pheatmap(sampleDistMatrix,
-         clustering_distance_rows=sampleDists,
-         clustering_distance_cols=sampleDists,
+pheatmap(sampleDistMatrix_UPA,
+         clustering_distance_rows=sampleDists_UPA,
+         clustering_distance_cols=sampleDists_UPA,
          col=colors)
 
-plotPCA(vsd, intgroup=c("stage"))
+plotPCA(vsd_UPA, intgroup=c("stage"))
 
 ####################################################################
 # Heatmap of top genes
 ####################################################################
 
-topVarGenes <- head(order(rowVars(assay(vsd)), decreasing = TRUE), 20)
+library("pheatmap")
 
-mat  <- assay(vsd)[ topVarGenes, ]
-mat  <- mat - rowMeans(mat)
-anno <- as.data.frame(colData(vsd)[, c("stage","sample")])
-pheatmap(mat, annotation_col = anno)
+topVarGenes <- head(order(rowVars(assay(vsd_UPA)), decreasing = TRUE), 100)
+
+mat_UPA  <- assay(vsd_UPA)[ topVarGenes, ]
+mat_UPA  <- mat_UPA - rowMeans(mat_UPA)
+anno_UPA <- as.data.frame(colData(vsd_UPA)[, c("stage","sample")])
+pheatmap(mat_UPA, annotation_col = anno_UPA)
+
+####################################################################
+# Perform the comparisons
+####################################################################
+
+res_ST_V_INT_UPA <- results(dds_UPA, contrast=c("stage","Intermediate", "Start"))
+res_ST_V_END_UPA <- results(dds_UPA, contrast=c("stage","End", "Start"))
+res_INT_V_END_UPA <- results(dds_UPA, contrast=c("stage", "End", "Intermediate"))
+
+#Summarise those results
+summary(res_ST_V_INT_UPA)
+sum(res_ST_V_INT_UPA$padj < 0.1, na.rm=TRUE)
+
+summary(res_ST_V_END_UPA)
+sum(res_ST_V_END_UPA$padj < 0.1, na.rm=TRUE)
+
+summary(res_INT_V_END_UPA)
+sum(res_INT_V_END_UPA$padj < 0.1, na.rm=TRUE)
+
+#Perform independent hypothesis weighting for p-value filtering
+
+library("IHW")
+resIHW_UPA <- results(dds_UPA, filterFun=ihw)
+
+#Summarise those results
+summary(resIHW_UPA)
+sum(resIHW_UPA$padj < 0.1, na.rm=TRUE)
+metadata(resIHW_UPA)$ihwResult
+
+#Perform alternative shrinkage with ashr
+library(ashr)
+res_ST_V_INT_ashr_UPA <- lfcShrink(dds_UPA, contrast=c("stage","Intermediate", "Start"), type="ashr")
+res_ST_V_END_ashr_UPA <- lfcShrink(dds_UPA, contrast=c("stage","End", "Start"), type="ashr")
+res_INT_V_END_ashr_UPA <- lfcShrink(dds_UPA, contrast=c("stage", "End", "Intermediate"), type="ashr")
+
+#Plot alternative shrinkage estimation for all results using ashr
+par(mfrow=c(1,3), mar=c(4,4,2,1))
+xlim <- c(1,1e5); ylim <- c(-3,3)
+plotMA(res_ST_V_INT_ashr_UPA, xlim=xlim, ylim=ylim, main="Start vs intermediate")
+plotMA(res_ST_V_END_ashr_UPA, xlim=xlim, ylim=ylim, main="Start vs end")
+plotMA(res_INT_V_END_ashr_UPA, xlim=xlim, ylim=ylim, main="Intermediate vs end")
+
+####################################################################
+# Export DF to CSV
+####################################################################
+
+#Save the DE analysis
+library(data.table)
+
+#Rename the df's
+res_ST_V_INT_ashr_UPA_DF <- setDT(as.data.frame(res_ST_V_INT_ashr_UPA), keep.rownames = TRUE)[]
+setnames(res_ST_V_INT_ashr_UPA_DF, old=c("log2FoldChange","padj"), new=c("SVI_UPA_log2FoldChange","SVI_UPA_padj"))
+res_ST_V_INT_ashr_UPA_DF[, c("baseMean","lfcSE", "pvalue"):=NULL]  # remove two columns
+
+res_ST_V_END_ashr_UPA_DF <- setDT(as.data.frame(res_ST_V_END_ashr_UPA), keep.rownames = TRUE)[]
+setnames(res_ST_V_END_ashr_UPA_DF, old=c("log2FoldChange","padj"), new=c("SVE_UPA_log2FoldChange","SVE_UPA_padj"))
+res_ST_V_END_ashr_UPA_DF[, c("baseMean","lfcSE", "pvalue"):=NULL]  # remove two columns
+
+res_INT_V_END_ashr_UPA_DF <- setDT(as.data.frame(res_INT_V_END_ashr_UPA), keep.rownames = TRUE)[]
+setnames(res_INT_V_END_ashr_UPA_DF , old=c("log2FoldChange","padj"), new=c("IVE_UPA_log2FoldChange","IVE_UPA_padj"))
+res_INT_V_END_ashr_UPA_DF [, c("baseMean","lfcSE", "pvalue"):=NULL]  # remove two columns
+
+#Merge and write
+UPA_df <- merge(res_ST_V_INT_ashr_UPA_DF, res_ST_V_END_ashr_UPA_DF, by = ("rn"))
+UPA_df <- merge(res_INT_V_END_ashr_UPA_DF, UPA_df, by = ("rn"))
+write.csv(UPA_df, 
+          file="UPA_results.csv")
+
+#Save the normalised count matrix and write
+write.csv(as.data.frame(assay(vsd_UPA)), 
+          file="UPA_normalised_counts.csv")
+
+####################################################################
+# NEK analysis
+####################################################################
+
+
+#Set up directory to read in quant.sf
+files <- file.path(wd,"quants", samples_NEK$sample, "quant.sf")
+names(files) <- samples_NEK$sample
+
+#Make a txdb which is used to create tx2gene
+library(GenomicFeatures)
+txdb = makeTxDbFromGFF('TriTrypDB-46_TbruceiTREU927.gff')
+k <- keys(txdb, keytype = "TXNAME")
+tx2gene <- select(txdb, k, "GENEID", "TXNAME")
+
+#Tximport and set up design
+library (tximport)
+txi <- tximport(files, type="salmon", tx2gene=tx2gene)
+
+#Set up DESeq2 for a single design analysis
+library (DESeq2)
+ddsTxi_NEK <- DESeqDataSetFromTximport(txi,
+                                       colData = samples_NEK,
+                                       design = ~ stage)
+#Keep genes above 10
+
+keep_NEK <- rowSums(counts(ddsTxi_NEK)) >= 10
+dds_NEK <- ddsTxi_NEK[keep_NEK,]
+
+#Specify the reference level
+dds_NEK$stage <- relevel(dds_NEK$stage, ref = "Start")
+dds_NEK$stage <- droplevels(dds_NEK$stage)
+
+#Perform DESeq2
+dds_NEK <- DESeq(dds_NEK)
+resultsNames(dds_NEK)
+
+####################################################################
+# Transforming the data for visualisation
+####################################################################
+ntd_NEK <- normTransform(dds_NEK)
+# this gives log2(n + 1)
+ntd_NEK <- normTransform(dds_NEK)
+library("vsn")
+meanSdPlot(assay(ntd_NEK))
+
+#Many transformation options available - VSD seems most appropriate
+vsd_NEK <- vst(dds_NEK, blind=TRUE)
+meanSdPlot(assay(vsd_NEK))
+
+####################################################################
+# Sample clustering
+####################################################################
+
+library("RColorBrewer")
+sampleDists_NEK <- dist(t(assay(vsd_NEK)))
+sampleDistMatrix_NEK <- as.matrix(sampleDists_NEK)
+colnames(sampleDistMatrix_NEK) <- NULL
+colors <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
+pheatmap(sampleDistMatrix_NEK,
+         clustering_distance_rows=sampleDists_NEK,
+         clustering_distance_cols=sampleDists_NEK,
+         col=colors)
+
+plotPCA(vsd_NEK, intgroup=c("stage"))
+
+####################################################################
+# Heatmap of top genes
+####################################################################
+
+library("pheatmap")
+
+topVarGenes <- head(order(rowVars(assay(vsd_NEK)), decreasing = TRUE), 100)
+
+mat_NEK  <- assay(vsd_NEK)[ topVarGenes, ]
+mat_NEK  <- mat_NEK - rowMeans(mat_NEK)
+anno_NEK <- as.data.frame(colData(vsd_NEK)[, c("stage","sample")])
+pheatmap(mat_NEK, annotation_col = anno_NEK)
+
+####################################################################
+# Perform the comparisons
+####################################################################
+
+res_ST_V_INT_NEK <- results(dds_NEK, contrast=c("stage","Intermediate", "Start"))
+res_ST_V_END_NEK <- results(dds_NEK, contrast=c("stage","End", "Start"))
+res_INT_V_END_NEK <- results(dds_NEK, contrast=c("stage", "End", "Intermediate"))
+
+#Summarise those results
+summary(res_ST_V_INT_NEK)
+sum(res_ST_V_INT_NEK$padj < 0.1, na.rm=TRUE)
+
+summary(res_ST_V_END_NEK)
+sum(res_ST_V_END_NEK$padj < 0.1, na.rm=TRUE)
+
+summary(res_INT_V_END_NEK)
+sum(res_INT_V_END_NEK$padj < 0.1, na.rm=TRUE)
+
+#Perform independent hypothesis weighting for p-value filtering
+
+library("IHW")
+resIHW_NEK <- results(dds_NEK, filterFun=ihw)
+
+#Summarise those results
+summary(resIHW_NEK)
+sum(resIHW_NEK$padj < 0.1, na.rm=TRUE)
+metadata(resIHW_NEK)$ihwResult
+
+#Perform alternative shrinkage with ashr
+library(ashr)
+res_ST_V_INT_ashr_NEK <- lfcShrink(dds_NEK, contrast=c("stage","Intermediate", "Start"), type="ashr")
+res_ST_V_END_ashr_NEK <- lfcShrink(dds_NEK, contrast=c("stage","End", "Start"), type="ashr")
+res_INT_V_END_ashr_NEK <- lfcShrink(dds_NEK, contrast=c("stage", "End", "Intermediate"), type="ashr")
+
+#Plot alternative shrinkage estimation for all results using ashr
+par(mfrow=c(1,3), mar=c(4,4,2,1))
+xlim <- c(1,1e5); ylim <- c(-3,3)
+plotMA(res_ST_V_INT_ashr_NEK, xlim=xlim, ylim=ylim, main="Start vs intermediate")
+plotMA(res_ST_V_END_ashr_NEK, xlim=xlim, ylim=ylim, main="Start vs end")
+plotMA(res_INT_V_END_ashr_NEK, xlim=xlim, ylim=ylim, main="Intermediate vs end")
+
+####################################################################
+# Export DF to CSV
+####################################################################
+
+#Save the DE analysis
+library(data.table)
+
+#Rename the df's
+res_ST_V_INT_ashr_NEK_DF <- setDT(as.data.frame(res_ST_V_INT_ashr_NEK), keep.rownames = TRUE)[]
+setnames(res_ST_V_INT_ashr_NEK_DF, old=c("log2FoldChange","padj"), new=c("SVI_NEK_log2FoldChange","SVI_NEK_padj"))
+res_ST_V_INT_ashr_NEK_DF[, c("baseMean","lfcSE", "pvalue"):=NULL]  # remove two columns
+
+res_ST_V_END_ashr_NEK_DF <- setDT(as.data.frame(res_ST_V_END_ashr_NEK), keep.rownames = TRUE)[]
+setnames(res_ST_V_END_ashr_NEK_DF, old=c("log2FoldChange","padj"), new=c("SVE_NEK_log2FoldChange","SVE_NEK_padj"))
+res_ST_V_END_ashr_NEK_DF[, c("baseMean","lfcSE", "pvalue"):=NULL]  # remove two columns
+
+res_INT_V_END_ashr_NEK_DF <- setDT(as.data.frame(res_INT_V_END_ashr_NEK), keep.rownames = TRUE)[]
+setnames(res_INT_V_END_ashr_NEK_DF , old=c("log2FoldChange","padj"), new=c("IVE_NEK_log2FoldChange","IVE_NEK_padj"))
+res_INT_V_END_ashr_NEK_DF [, c("baseMean","lfcSE", "pvalue"):=NULL]  # remove two columns
+
+#Merge and write
+NEK_df <- merge(res_ST_V_INT_ashr_NEK_DF, res_ST_V_END_ashr_NEK_DF, by = ("rn"))
+NEK_df <- merge(res_INT_V_END_ashr_NEK_DF, NEK_df, by = ("rn"))
+write.csv(NEK_df, 
+          file="NEK_results.csv")
+
+#Save the normalised count matrix and write
+write.csv(as.data.frame(assay(vsd_NEK)), 
+          file="NEK_normalised_counts.csv")
+
+####################################################################
+# Combined
+####################################################################
+#Set up directory to read in quant.sf
+files <- file.path(wd,"quants", samples$sample, "quant.sf")
+names(files) <- samples$sample
+
+#Make a txdb which is used to create tx2gene
+library(GenomicFeatures)
+txdb = makeTxDbFromGFF('TriTrypDB-46_TbruceiTREU927.gff')
+k <- keys(txdb, keytype = "TXNAME")
+tx2gene <- select(txdb, k, "GENEID", "TXNAME")
+
+#Tximport and set up design
+library (tximport)
+txi <- tximport(files, type="salmon", tx2gene=tx2gene)
+
+#Set up DESeq2 for a single design analysis
+library (DESeq2)
+ddsTxi_combi <- DESeqDataSetFromTximport(txi,
+                                       colData = samples,
+                                       design = ~ stage + line)
+#Keep genes above 10
+
+keep_combi <- rowSums(counts(ddsTxi_combi)) >= 10
+dds_combi <- ddsTxi_combi[keep_combi,]
+
+#Specify the reference level
+dds_combi$stage <- relevel(dds_combi$stage, ref = "Start")
+dds_combi$stage <- droplevels(dds_combi$stage)
+
+#Perform DESeq2
+dds_combi <- DESeq(dds_combi)
+resultsNames(dds_combi)
+
+####################################################################
+# Transforming the data for visualisation
+####################################################################
+ntd_combi <- normTransform(dds_combi)
+# this gives log2(n + 1)
+ntd_combi <- normTransform(dds_combi)
+library("vsn")
+meanSdPlot(assay(ntd_combi))
+
+#Many transformation options available - VSD seems most appropriate
+vsd_combi <- vst(dds_combi, blind=TRUE)
+meanSdPlot(assay(vsd_combi))
+
+####################################################################
+# Sample clustering
+####################################################################
+
+library("RColorBrewer")
+sampleDists_combi <- dist(t(assay(vsd_combi)))
+sampleDistMatrix_combi <- as.matrix(sampleDists_combi)
+colnames(sampleDistMatrix_combi) <- NULL
+colors <- colorRampPalette( rev(brewer.pal(9, "Blues")) )(255)
+pheatmap(sampleDistMatrix_combi,
+         clustering_distance_rows=sampleDists_combi,
+         clustering_distance_cols=sampleDists_combi,
+         col=colors)
+
+plotPCA(vsd_combi, intgroup=c("stage"))
+
+####################################################################
+# Heatmap of top genes
+####################################################################
+
+library("pheatmap")
+
+topVarGenes <- head(order(rowVars(assay(vsd_combi)), decreasing = TRUE), 100)
+
+mat_combi  <- assay(vsd_combi)[ topVarGenes, ]
+mat_combi  <- mat_combi - rowMeans(mat_combi)
+anno_combi <- as.data.frame(colData(vsd_combi)[, c("stage","sample")])
+pheatmap(mat_combi, annotation_col = anno_combi)
+
+####################################################################
+# Perform the comparisons
+####################################################################
+
+res_ST_V_INT_combi <- results(dds_combi, contrast=c("stage","Intermediate", "Start"))
+res_ST_V_END_combi <- results(dds_combi, contrast=c("stage","End", "Start"))
+res_INT_V_END_combi <- results(dds_combi, contrast=c("stage", "End", "Intermediate"))
+res_NEK_V_UPA_combi <- results(dds_combi, contrast=c("line", "UPA", "NEK"))
+
+#Summarise those results
+summary(res_ST_V_INT_combi)
+sum(res_ST_V_INT_combi$padj < 0.1, na.rm=TRUE)
+
+summary(res_ST_V_END_combi)
+sum(res_ST_V_END_combi$padj < 0.1, na.rm=TRUE)
+
+summary(res_INT_V_END_combi)
+sum(res_INT_V_END_combi$padj < 0.1, na.rm=TRUE)
+
+#Perform independent hypothesis weighting for p-value filtering
+
+library("IHW")
+resIHW_combi <- results(dds_combi, filterFun=ihw)
+
+#Summarise those results
+summary(resIHW_combi)
+sum(resIHW_combi$padj < 0.1, na.rm=TRUE)
+metadata(resIHW_combi)$ihwResult
+
+#Perform alternative shrinkage with ashr
+library(ashr)
+res_ST_V_INT_ashr_combi <- lfcShrink(dds_combi, contrast=c("stage","Intermediate", "Start"), type="ashr")
+res_ST_V_END_ashr_combi <- lfcShrink(dds_combi, contrast=c("stage","End", "Start"), type="ashr")
+res_INT_V_END_ashr_combi <- lfcShrink(dds_combi, contrast=c("stage", "End", "Intermediate"), type="ashr")
+res_NEK_V_UPA_ashr_combi <- lfcShrink(dds_combi, contrast=c("line", "UPA", "NEK"), type="ashr")
+
+#Plot alternative shrinkage estimation for all results using ashr
+par(mfrow=c(1,4), mar=c(4,4,2,1))
+xlim <- c(1,1e5); ylim <- c(-3,3)
+plotMA(res_ST_V_INT_ashr_combi, xlim=xlim, ylim=ylim, main="Start vs intermediate")
+plotMA(res_ST_V_END_ashr_combi, xlim=xlim, ylim=ylim, main="Start vs end")
+plotMA(res_INT_V_END_ashr_combi, xlim=xlim, ylim=ylim, main="Intermediate vs end")
+plotMA(res_NEK_V_UPA_ashr_combi , xlim=xlim, ylim=ylim, main="NEK vs UPA")
+
+####################################################################
+# Export DF to CSV
+####################################################################
+
+#Save the DE analysis
+library(data.table)
+
+#Rename the df's
+res_ST_V_INT_ashr_combi_DF <- setDT(as.data.frame(res_ST_V_INT_ashr_combi), keep.rownames = TRUE)[]
+setnames(res_ST_V_INT_ashr_combi_DF, old=c("log2FoldChange","padj"), new=c("SVI_combi_log2FoldChange","SVI_combi_padj"))
+res_ST_V_INT_ashr_combi_DF[, c("baseMean","lfcSE", "pvalue"):=NULL]  # remove two columns
+
+res_ST_V_END_ashr_combi_DF <- setDT(as.data.frame(res_ST_V_END_ashr_combi), keep.rownames = TRUE)[]
+setnames(res_ST_V_END_ashr_combi_DF, old=c("log2FoldChange","padj"), new=c("SVE_combi_log2FoldChange","SVE_combi_padj"))
+res_ST_V_END_ashr_combi_DF[, c("baseMean","lfcSE", "pvalue"):=NULL]  # remove two columns
+
+res_INT_V_END_ashr_combi_DF <- setDT(as.data.frame(res_INT_V_END_ashr_combi), keep.rownames = TRUE)[]
+setnames(res_INT_V_END_ashr_combi_DF , old=c("log2FoldChange","padj"), new=c("IVE_combi_log2FoldChange","IVE_combi_padj"))
+res_INT_V_END_ashr_combi_DF [, c("baseMean","lfcSE", "pvalue"):=NULL]  # remove two columns
+
+res_NEK_V_UPA_ashr_combi_DF <- setDT(as.data.frame(res_NEK_V_UPA_ashr_combi), keep.rownames = TRUE)[]
+setnames(res_NEK_V_UPA_ashr_combi_DF , old=c("log2FoldChange","padj"), new=c("NVU_combi_log2FoldChange","NVU_combi_padj"))
+res_NEK_V_UPA_ashr_combi_DF [, c("baseMean","lfcSE", "pvalue"):=NULL]  # remove two columns
+
+#Merge and write
+combi_df <- merge(res_ST_V_INT_ashr_combi_DF, res_ST_V_END_ashr_combi_DF, by = ("rn"))
+combi_df <- merge(res_INT_V_END_ashr_combi_DF, combi_df, by = ("rn"))
+combi_df <- merge(res_NEK_V_UPA_ashr_combi_DF, combi_df, by = ("rn"))
+write.csv(combi_df, 
+          file="combi_results.csv")
+
+#Save the normalised count matrix and write
+write.csv(as.data.frame(assay(vsd_combi)), 
+          file="combi_normalised_counts.csv")
+
+####################################################################
+# Export all DF to CSV
+####################################################################
+
+#Save the DE analysis
+Final_df <- merge(UPA_df, combi_df, by = ("rn"))
+Final_df <- merge(NEK_df, Final_df, by = ("rn"))
+
+write.csv(Final_df, file="Final_results.csv")
+####################################################################
+# Exploratory analysis
+####################################################################
+shared_df <- subset (Final_df, SVE_NEK_padj < 0.1 & SVE_UPA_padj < 0.1)
+shared <- shared_df$rn
+
+shared_up <- subset (shared_df, SVE_NEK_log2FoldChange > 0 & SVE_UPA_log2FoldChange > 0)
+shared_up <- shared_up$rn 
+
+shared_down <- subset (shared_df, SVE_NEK_log2FoldChange < 0 & SVE_UPA_log2FoldChange < 0)
+shared_down <- shared_down$rn 
+
+up_mat  <- assay(vsd_combi)[ shared_up, ]
+up_mat_calc  <- up_mat - rowMeans(up_mat)
+anno <- as.data.frame(colData(vsd_combi)[, c("line","stage")])
+sampleDists <- dist(t(assay(vsd_combi)))
+pheatmap(up_mat_calc, annotation_col = anno, clustering_distance_cols = sampleDists, show_rownames = FALSE)
+
+down_mat  <- assay(vsd_combi)[ shared_down, ]
+down_mat_calc  <- down_mat - rowMeans(down_mat)
+anno <- as.data.frame(colData(vsd_combi)[, c("line","stage")])
+sampleDists <- dist(t(assay(vsd_combi)))
+pheatmap(down_mat_calc, annotation_col = anno, clustering_distance_cols = sampleDists, show_rownames = FALSE)
+
+same_d_mat <- rbind(up_mat, down_mat)
+anno <- as.data.frame(colData(vsd_combi)[, c("line","stage")])
+sampleDists <- dist(t(assay(vsd_combi)))
+pheatmap(same_d_mat, annotation_col = anno, clustering_distance_cols = sampleDists, show_rownames = TRUE)
+
+write.csv(same_d_mat, file="DE_same_direction.csv")
