@@ -484,6 +484,8 @@ write.csv(as.data.frame(assay(vsd_combi)),
 Final_df <- merge(UPA_df, combi_df, by = ("rn"))
 Final_df <- merge(NEK_df, Final_df, by = ("rn"))
 
+shared_df <- subset (Final_df, SVE_NEK_padj < 0.1 & SVE_UPA_padj < 0.1)
+shared_df
 write.csv(Final_df, file="Final_results.csv")
 ####################################################################
 # Exploratory analysis
@@ -491,19 +493,24 @@ write.csv(Final_df, file="Final_results.csv")
 shared_df <- subset (Final_df, SVE_NEK_padj < 0.1 & SVE_UPA_padj < 0.1)
 shared <- shared_df$rn
 
+shared_df
 shared_up <- subset (shared_df, SVE_NEK_log2FoldChange > 0 & SVE_UPA_log2FoldChange > 0)
-shared_up <- shared_up$rn 
+shared_up_names <- shared_up$rn 
 
 shared_down <- subset (shared_df, SVE_NEK_log2FoldChange < 0 & SVE_UPA_log2FoldChange < 0)
-shared_down <- shared_down$rn 
+shared_down_names <- shared_down$rn 
 
-up_mat  <- assay(vsd_combi)[ shared_up, ]
+same_d_mat <- rbind(shared_down, shared_up)
+same_d_mat <- same_d_mat[, c("rn",'SVE_NEK_log2FoldChange', 'SVE_UPA_log2FoldChange', "SVE_UPA_padj", "SVE_NEK_padj"), with = FALSE]
+same_d_log <- same_d_mat
+
+up_mat  <- assay(vsd_combi)[ shared_up_names, ]
 up_mat_calc  <- up_mat - rowMeans(up_mat)
 anno <- as.data.frame(colData(vsd_combi)[, c("line","stage")])
 sampleDists <- dist(t(assay(vsd_combi)))
 pheatmap(up_mat_calc, annotation_col = anno, clustering_distance_cols = sampleDists, show_rownames = FALSE)
 
-down_mat  <- assay(vsd_combi)[ shared_down, ]
+down_mat  <- assay(vsd_combi)[ shared_down_names, ]
 down_mat_calc  <- down_mat - rowMeans(down_mat)
 anno <- as.data.frame(colData(vsd_combi)[, c("line","stage")])
 sampleDists <- dist(t(assay(vsd_combi)))
@@ -514,4 +521,6 @@ anno <- as.data.frame(colData(vsd_combi)[, c("line","stage")])
 sampleDists <- dist(t(assay(vsd_combi)))
 pheatmap(same_d_mat, annotation_col = anno, clustering_distance_cols = sampleDists, show_rownames = TRUE)
 
-write.csv(same_d_mat, file="DE_same_direction.csv")
+same_d_mat <- setDT(as.data.frame(same_d_mat), keep.rownames = TRUE)[]
+same_d_final_df <- merge(same_d_log, same_d_mat, by = "rn") 
+write.csv(same_d_final_df, file="DE_same_direction.csv")
