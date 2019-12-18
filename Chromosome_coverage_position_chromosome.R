@@ -81,6 +81,12 @@ ggplot(re_datafr, mapping = aes(x = start/1000, y = log2)) +
              color = "black", size=.5) +
   geom_line(aes(color=Cell_line, group = Cell_line), size = 0.3) +
   xlab("Genomic position (kbp)") +
+  theme (axis.text.x = element_text(size = 15),
+         axis.text.y = element_text(size= 15),
+         axis.title.y = element_text(size= 15),
+         axis.title.x = element_text(size= 15),
+         legend.text = element_text(size=15),
+         legend.title = element_text(size=15)) +
   ylab ("log2 ratio") +
   ggtitle("") +
   geom_point(aes(size = re_datafr$Duplicated, colour = re_datafr$Cell_line), show.legend = FALSE) +

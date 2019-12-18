@@ -9,9 +9,9 @@
 
 #Set up the working directories
 dir <- system.file("extdata", package="tximportData")
-sample_dir <- ("/Users/s1886853/TERGO/Monomorph_DE/quants")
-setwd("/Users/s1886853/TERGO/Monomorph_DE")
-wd <- ("/Users/s1886853/TERGO/Monomorph_DE")
+sample_dir <- ("/Users/s1886853/TERGO/Monomorph/DE/quants")
+setwd("/Users/s1886853/TERGO/Monomorph/DE")
+wd <- ("/Users/s1886853/TERGO/Monomorph/DE")
 
 #Read in the meta data and modify it for tximport
 samples <- read.table(file.path(wd,"samples.txt"), header=TRUE)
@@ -382,7 +382,7 @@ pheatmap(sampleDistMatrix_combi,
          clustering_distance_cols=sampleDists_combi,
          col=colors)
 
-plotPCA(vsd_combi, intgroup=c("stage"))
+plotPCA(vsd_combi, intgroup=c("stage", "line"))
 
 ####################################################################
 # Heatmap of top genes
@@ -434,9 +434,9 @@ res_INT_V_END_ashr_combi <- lfcShrink(dds_combi, contrast=c("stage", "End", "Int
 res_NEK_V_UPA_ashr_combi <- lfcShrink(dds_combi, contrast=c("line", "UPA", "NEK"), type="ashr")
 
 #Plot alternative shrinkage estimation for all results using ashr
-par(mfrow=c(1,4), mar=c(4,4,2,1))
+par(mfrow=c(1,4), mar=c(4,4,2,1), pch =100)
 xlim <- c(1,1e5); ylim <- c(-3,3)
-plotMA(res_ST_V_INT_ashr_combi, xlim=xlim, ylim=ylim, main="Start vs intermediate")
+plotMA(res_ST_V_INT_ashr_combi, xlim=xlim,  ylim=ylim, main="Start vs intermediate")
 plotMA(res_ST_V_END_ashr_combi, xlim=xlim, ylim=ylim, main="Start vs end")
 plotMA(res_INT_V_END_ashr_combi, xlim=xlim, ylim=ylim, main="Intermediate vs end")
 plotMA(res_NEK_V_UPA_ashr_combi , xlim=xlim, ylim=ylim, main="NEK vs UPA")
@@ -483,7 +483,7 @@ write.csv(as.data.frame(assay(vsd_combi)),
 #Save the DE analysis
 Final_df <- merge(UPA_df, combi_df, by = ("rn"))
 Final_df <- merge(NEK_df, Final_df, by = ("rn"))
-
+Final_df
 shared_df <- subset (Final_df, SVE_NEK_padj < 0.1 & SVE_UPA_padj < 0.1)
 shared_df
 write.csv(Final_df, file="Final_results.csv")
@@ -524,3 +524,87 @@ pheatmap(same_d_mat, annotation_col = anno, clustering_distance_cols = sampleDis
 same_d_mat <- setDT(as.data.frame(same_d_mat), keep.rownames = TRUE)[]
 same_d_final_df <- merge(same_d_log, same_d_mat, by = "rn") 
 write.csv(same_d_final_df, file="DE_same_direction.csv")
+
+
+#Plot alternative shrinkage estimation for all results using ashr
+par(mfrow=c(1,3), mar=c(4,4,4,2), pch =100)
+xlim <- c(1,1e5); ylim <- c(-3,3)
+plotMA(res_ST_V_INT_ashr_NEK, alpha = 0.1,  xlim=xlim,  ylim=ylim, main="(a) NEK start vs end", cex.lab = 1.4)
+plotMA(res_ST_V_END_ashr_UPA, alpha = 0.1,  xlim=xlim, ylim=ylim, main="(b) UPA start vs end", cex.lab = 1.4)
+plotMA(res_NEK_V_UPA_ashr_combi, alpha = 0.1, xlim=xlim, ylim=ylim, main="(c) NEK vs UPA all stages", cex.lab = 1.4)
+
+
+library(EnhancedVolcano)
+
+
+EnhancedVolcano(res_ST_V_END_ashr_NEK,
+                lab = rownames(res_ST_V_END_ashr_NEK),
+                x = 'log2FoldChange',
+                y = 'padj',
+                xlim=c(-6,6),
+                xlab = bquote(~Log[2]~ 'fold change'),
+                ylab = bquote(~-Log[10]~adjusted~italic(P)),
+                pCutoff = 0.0001,
+                FCcutoff = 1.5,
+                colAlpha = 1,
+                legend=c('NS','Log2 FC','Adjusted p-value',
+                         'Adjusted p-value & Log2 FC'),
+                legendPosition = 'top',
+                legendLabSize = 10,
+                legendIconSize = 3.0,
+                title = "NEK start vs end",
+                subtitle = "")
+
+EnhancedVolcano(res_ST_V_END_ashr_UPA,
+                lab = rownames(res_ST_V_END_ashr_UPA),
+                x = 'log2FoldChange',
+                y = 'padj',
+                xlim=c(-6,6),
+                xlab = bquote(~Log[2]~ 'fold change'),
+                ylab = bquote(~-Log[10]~adjusted~italic(P)),
+                pCutoff = 0.0001,
+                FCcutoff = 1.5,
+                colAlpha = 1,
+                legend=c('NS','Log2 FC','Adjusted p-value',
+                         'Adjusted p-value & Log2 FC'),
+                legendPosition = 'top',
+                legendLabSize = 10,
+                legendIconSize = 3.0,
+                title = "UPA start vs end",
+                subtitle = "")
+
+EnhancedVolcano(res_ST_V_END_ashr_combi,
+                lab = rownames(res_NEK_V_UPA_ashr_combi),
+                x = 'log2FoldChange',
+                y = 'padj',
+                xlim=c(-6,6),
+                xlab = bquote(~Log[2]~ 'fold change'),
+                ylab = bquote(~-Log[10]~adjusted~italic(P)),
+                pCutoff = 0.0001,
+                FCcutoff = 1.5,
+                colAlpha = 1,
+                legend=c('NS','Log2 FC','Adjusted p-value',
+                         'Adjusted p-value & Log2 FC'),
+                legendPosition = 'top',
+                legendLabSize = 10,
+                legendIconSize = 3.0,
+                title = "Combined start vs end",
+                subtitle = "")
+
+EnhancedVolcano(res_NEK_V_UPA_ashr_combi,
+                lab = rownames(res_NEK_V_UPA_ashr_combi),
+                x = 'log2FoldChange',
+                y = 'padj',
+                xlim=c(-6,6),
+                xlab = bquote(~Log[2]~ 'fold change'),
+                ylab = bquote(~-Log[10]~adjusted~italic(P)),
+                pCutoff = 0.0001,
+                FCcutoff = 1.5,
+                colAlpha = 1,
+                legend=c('NS','Log2 FC','Adjusted p-value',
+                         'Adjusted p-value & Log2 FC'),
+                legendPosition = 'top',
+                legendLabSize = 10,
+                legendIconSize = 3.0,
+                title = "NEK vs UPA (every stage)",
+                subtitle = "")
