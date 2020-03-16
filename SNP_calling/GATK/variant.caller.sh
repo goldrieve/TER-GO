@@ -7,25 +7,28 @@ base=$(basename $sample ".recal.bam")
 
 ulimit -c unlimited
 
-/Users/s1886853/Pkgs/gatk-4.1.4.1/./gatk HaplotypeCaller \
+#/Users/s1886853/Pkgs/gatk-4.1.4.1/./gatk HaplotypeCaller \
 	-I ${dir}/${base}.recal.bam \
 	-O /Users/s1886853/TERGO/Monomorph/SIF_pathway/GATK/calls_V2/${base}.g.vcf \
 	-R ~/TERGO/Monomorph/SIF_pathway/SIF.fasta \
 	-ERC GVCF 
 done
 
-/Users/s1886853/Pkgs/gatk-4.1.4.1/./gatk CombineGVCFs \
+dir="/Users/s1886853/TERGO/Monomorph/SIF_pathway/GATK/calls_V2"
+
+#find /Users/s1886853/TERGO/Monomorph/SIF_pathway/GATK/calls_V2 -name "*.g.vcf" > /Users/s1886853/TERGO/Monomorph/SIF_pathway/GATK/calls_V2/input.list
+
+#/Users/s1886853/Pkgs/gatk-4.1.4.1/./gatk CombineGVCFs \
 	-R /Users/s1886853/TERGO/Monomorph/SIF_pathway/SIF.fasta \
 	-V ${dir}/input.list \ 
 	-O ${dir}/combined.g.vcf
 
-dir="/Users/s1886853/TERGO/Monomorph/SIF_pathway/GATK/calls_V2"
+dir="/Users/s1886853/TERGO/Monomorph/Tcomp/GATK/calls_v2"
 
 gatk GenotypeGVCFs \
-	-R /Users/s1886853/TERGO/Monomorph/SIF_pathway/SIF.fasta \
+	-R /Users/s1886853/TERGO/Reference_genomes/Tb927/TriTrypDB-46_TbruceiTREU927_Genome.fasta \
 	-V ${dir}/combined.g.vcf \
-	-newQual \
-	-O calls.vcf
+	-O ${dir}/calls.vcf
 
 gatk SelectVariants \
 	-V ${dir}/calls.vcf \

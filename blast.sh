@@ -1,11 +1,11 @@
 source activate main_env 
 
-for sample in `ls /Users/s1886853/TERGO/Leish/fasta/*_db_seq`
+for sample in `ls /Users/s1886853/ncbi/public/sra/Fastq/*_1.fastq.gz`
 
 do
-dir="."
-base=$(basename $sample "_db_seq.nhr")
+dir="/Users/s1886853/ncbi/public/sra/Fastq"
+base=$(basename $sample "_1.fastq.gz")
 
-blastn -task blastn -query /Users/s1886853/TERGO/Leish/ITS1_Guy/ITS1.fasta -db ${dir}/${base}_db_seq.nhr -evalue 1e-10 -outfmt 6 -out ${base}.blastn
+blastn -task blastn -query ${dir}/${base}_1.fastq.gz -db /Users/s1886853/TERGO/Monomorph/Rotat/rotat.fasta -evalue 1e-10 -outfmt 6 -out ${dir}/${base}.blastn
 
 done
