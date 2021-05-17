@@ -1,4 +1,0 @@
-2021-01-18 19:07:03 - MEGAHIT v1.2.9
-2021-01-18 19:07:03 - Using megahit_core with POPCNT and BMI2 support
-2021-01-18 19:07:03 - Convert reads to binary library
-2021-01-18 19:07:03 - command /usr/local/anaconda3/envs/main_env/bin/megahit_core buildlib /Users/s1886853/OneDrive - University of Edinburgh/PHDZLE/TERGO/GitHub/TER-GO/KOMICS/tmp.NEK_END_run1_megahit/tmp/reads.lib /Users/s1886853/OneDrive - University of Edinburgh/PHDZLE/TERGO/GitHub/TER-GO/KOMICS/tmp.NEK_END_run1_megahit/tmp/reads.lib

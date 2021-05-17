@@ -1,7 +1,10 @@
-for sample in `ls /Users/s1886853/GATK/Clone/*.rg.marked.bam`
+/Users/s1886853/Pkgs/gatk-4.1.4.1/./gatk IndexFeatureFile \
+     -I /Volumes/LaCie/Raw_data/mono_raw/trimmed/calls_v1/top_calls.vcf
+
+for sample in `ls /Volumes/LaCie/Raw_data/mono_raw/trimmed/*.rg.marked.bam`
 
 do
-dir="/Users/s1886853/GATK/Clone"
+dir="/Volumes/LaCie/Raw_data/mono_raw/trimmed"
 base=$(basename $sample ".rg.marked.bam")
 
 ulimit -c unlimited
@@ -9,14 +12,14 @@ ulimit -c unlimited
 /Users/s1886853/Pkgs/gatk-4.1.4.1/./gatk BaseRecalibrator \
    -I ${dir}/${base}.rg.marked.bam \
    -R /Users/s1886853/TERGO/Reference_genomes/Tb927/TriTrypDB-46_TbruceiTREU927_Genome.fasta \
-   --known-sites /Users/s1886853/GATK/Tcomp_GATK/calls_v1/confident.sites.filtered.vcf \
+   --known-sites ${dir}/calls_v1/top_calls.vcf \
    -O ${dir}/${base}.recal.table
 
 done
 
-for sample in `ls /Users/s1886853/GATK/Clone/*.rg.marked.bam`
+for sample in `ls /Volumes/LaCie/Raw_data/mono_raw/trimmed/*.rg.marked.bam`
 do
-dir="/Users/s1886853/GATK/Clone"
+dir="/Volumes/LaCie/Raw_data/mono_raw/trimmed"
 base=$(basename $sample ".rg.marked.bam")
 
 /Users/s1886853/Pkgs/gatk-4.1.4.1/./gatk ApplyBQSR \
@@ -27,9 +30,9 @@ base=$(basename $sample ".rg.marked.bam")
 
 done
 
-for sample in `ls /Users/s1886853/GATK/Clone/*.recal.bam`
+for sample in `ls /Volumes/LaCie/Raw_data/mono_raw/trimmed/*.recal.bam`
 do
-dir="/Users/s1886853/GATK/Clone"
+dir="/Volumes/LaCie/Raw_data/mono_raw/trimmed"
 base=$(basename $sample ".recal.bam")
 
 ulimit -c unlimited

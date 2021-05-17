@@ -1,11 +1,19 @@
 source activate main_env 
-
-for sample in `ls /Users/s1886853/ncbi/public/sra/Fastq/*_1.fastq.gz`
+export BLASTDB="/Users/s1886853/databases/nt_db/nt"
+for sample in `ls /Users/s1886853/Desktop/*_top_500_overrepresented.fa`
 
 do
-dir="/Users/s1886853/ncbi/public/sra/Fastq"
-base=$(basename $sample "_1.fastq.gz")
+dir="/Users/s1886853/Desktop"
+base=$(basename $sample "_top_500_overrepresented.fa")
 
-blastn -task blastn -query ${dir}/${base}_1.fastq.gz -db /Users/s1886853/TERGO/Monomorph/Rotat/rotat.fasta -evalue 1e-10 -outfmt 6 -out ${dir}/${base}.blastn
-
+/usr/local/ncbi/blast/bin/./blastn \
+	-task blastn \
+	-query ${dir}/${base}_top_500_overrepresented.fa \
+	-db ~/databases/nt_db/nt \
+	-outfmt '6 qseqid staxids bitscore std sscinames' \
+	-max_target_seqs 1 \
+	-max_hsps 1 \
+	-num_threads 16 \
+	-evalue 1e-25 \
+	-out ~/Desktop/${base}.out
 done
